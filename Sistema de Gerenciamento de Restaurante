@@ -1,0 +1,60 @@
+CREATE DATABASE RestaurantManagement;
+USE RestaurantManagement;
+CREATE TABLE Customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100) UNIQUE
+);
+CREATE TABLE Tables (
+    table_id INT AUTO_INCREMENT PRIMARY KEY,
+    table_number VARCHAR(10) UNIQUE NOT NULL,
+    seats INT NOT NULL,
+    status ENUM('available', 'occupied', 'reserved') DEFAULT 'available'
+);
+CREATE TABLE Orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    table_id INT,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pending', 'completed', 'cancelled') DEFAULT 'pending',
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (table_id) REFERENCES Tables(table_id)
+);
+INSERT INTO Customers (first_name, last_name, phone, email)
+VALUES ('Alice', 'Johnson', '555-1234', 'alice.johnson@example.com'),
+       ('Bob', 'Smith', '555-5678', 'bob.smith@example.com');
+INSERT INTO Tables (table_number, seats, status)
+VALUES ('T1', 4, 'available'),
+       ('T2', 2, 'available'),
+       ('T3', 6, 'reserved');
+INSERT INTO Orders (customer_id, table_id, status)
+VALUES (1, 1, 'pending'),
+       (2, 2, 'completed');
+SELECT * FROM Customers;
+SELECT * FROM Tables;
+SELECT o.order_id, c.first_name, c.last_name, t.table_number, o.order_date, o.status
+FROM Orders o
+JOIN Customers c ON o.customer_id = c.customer_id
+JOIN Tables t ON o.table_id = t.table_id;
+SELECT o.order_id, c.first_name, c.last_name, t.table_number, o.order_date
+FROM Orders o
+JOIN Customers c ON o.customer_id = c.customer_id
+JOIN Tables t ON o.table_id = t.table_id
+WHERE o.status = 'pending';
+UPDATE Tables
+SET status = 'occupied'
+WHERE table_id = 1;
+UPDATE Orders
+SET status = 'completed'
+WHERE order_id = 1;
+UPDATE Customers
+SET phone = '555-9999'
+WHERE email = 'alice.johnson@example.com';
+DELETE FROM Orders
+WHERE order_id = 2;
+DELETE FROM Customers
+WHERE email = 'bob.smith@example.com';
+DELETE FROM Tables
+WHERE table_number = 'T3';
