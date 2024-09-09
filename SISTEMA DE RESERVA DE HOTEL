@@ -1,0 +1,52 @@
+CREATE DATABASE HotelReservation;
+USE HotelReservation;
+CREATE TABLE Guests (
+    guest_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20)
+);
+CREATE TABLE Rooms (
+    room_id INT AUTO_INCREMENT PRIMARY KEY,
+    room_number VARCHAR(10) UNIQUE NOT NULL,
+    room_type VARCHAR(50) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    status ENUM('available', 'occupied', 'maintenance') DEFAULT 'available'
+);
+CREATE TABLE Reservations (
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT,
+    room_id INT,
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    reservation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('confirmed', 'checked-in', 'checked-out', 'canceled') DEFAULT 'confirmed',
+    FOREIGN KEY (guest_id) REFERENCES Guests(guest_id),
+    FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
+);
+INSERT INTO Guests (first_name, last_name, email, phone)
+VALUES ('John', 'Doe', 'john.doe@example.com', '123-456-7890');
+INSERT INTO Rooms (room_number, room_type, price)
+VALUES ('101', 'Single', 100.00),
+       ('102', 'Double', 150.00),
+       ('103', 'Suite', 250.00);
+INSERT INTO Reservations (guest_id, room_id, check_in, check_out)
+VALUES (1, 1, '2024-10-01', '2024-10-05');
+SELECT * FROM Guests;
+SELECT * FROM Rooms WHERE status = 'available';
+SELECT r.reservation_id, g.first_name, g.last_name, ro.room_number, r.check_in, r.check_out
+FROM Reservations r
+JOIN Guests g ON r.guest_id = g.guest_id
+JOIN Rooms ro ON r.room_id = ro.room_id
+WHERE g.email = 'john.doe@example.com';
+UPDATE Rooms
+SET status = 'occupied'
+WHERE room_id = 1;
+UPDATE Guests
+SET phone = '987-654-3210'
+WHERE email = 'john.doe@example.com';
+DELETE FROM Reservations
+WHERE reservation_id = 1;
+DELETE FROM Guests
+WHERE email = 'john.doe@example.com';
