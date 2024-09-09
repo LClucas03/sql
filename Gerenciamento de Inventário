@@ -1,0 +1,57 @@
+CREATE DATABASE EmployeeManagement;
+USE EmployeeManagement;
+CREATE TABLE Departments (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(100) UNIQUE NOT NULL
+);
+CREATE TABLE Employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    hire_date DATE NOT NULL,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES Departments(department_id)
+);
+CREATE TABLE Salaries (
+    salary_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    amount DECIMAL(10, 2) NOT NULL,
+    effective_date DATE NOT NULL,
+    FOREIGN KEY (employee_id) REFERENCES Employees(employee_id)
+);
+INSERT INTO Departments (department_name)
+VALUES ('HR'), ('Finance'), ('Engineering');
+INSERT INTO Employees (first_name, last_name, email, phone, hire_date, department_id)
+VALUES ('Alice', 'Smith', 'alice.smith@example.com', '555-1234', '2024-01-15', 1),
+       ('Bob', 'Johnson', 'bob.johnson@example.com', '555-5678', '2024-03-22', 2),
+       ('Charlie', 'Williams', 'charlie.williams@example.com', '555-8765', '2024-06-10', 3);
+INSERT INTO Salaries (employee_id, amount, effective_date)
+VALUES (1, 50000.00, '2024-01-15'),
+       (2, 60000.00, '2024-03-22'),
+       (3, 70000.00, '2024-06-10');
+SELECT * FROM Employees;
+SELECT e.employee_id, e.first_name, e.last_name, d.department_name
+FROM Employees e
+JOIN Departments d ON e.department_id = d.department_id;
+SELECT e.first_name, e.last_name, s.amount, s.effective_date
+FROM Salaries s
+JOIN Employees e ON s.employee_id = e.employee_id
+WHERE e.email = 'alice.smith@example.com';
+SELECT e.first_name, e.last_name, s.amount, s.effective_date
+FROM Employees e
+JOIN Salaries s ON e.employee_id = s.employee_id;
+UPDATE Employees
+SET department_id = 2
+WHERE email = 'bob.johnson@example.com';
+UPDATE Employees
+SET department_id = 2
+WHERE email = 'bob.johnson@example.com';
+UPDATE Salaries
+SET amount = 55000.00
+WHERE employee_id = 1 AND effective_date = '2024-01-15';
+DELETE FROM Employees
+WHERE email = 'charlie.williams@example.com';
+DELETE FROM Departments
+WHERE department_name = 'Finance';
